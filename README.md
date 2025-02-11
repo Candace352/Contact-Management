@@ -1,17 +1,49 @@
-# contact_management_app
+# Contact Management Application
 
-A new Flutter project.
+This is a semester-long project done in Flutter, where several tasks will be completed weekly. The goal is to design a fully functioning Flutter application by the end of the semester.
 
-## Getting Started
+## Task 1
 
-This project is a starting point for a Flutter application.
+**Lab Tasks:**
 
-A few resources to get you started if this is your first Flutter project:
+### Task 1: Project Setup
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. Created a new Flutter project named 'contact_management_app'
+2. Established a basic folder structure in the lib folder:
+   - `screens/` or `pages/`
+   - `services/`
+   - `models/` (optional)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# Contact-Management
+### Task 2: Bottom Navigation Implementation
+
+1. Created four screens in the `screens/` folder:
+   - `contacts_list.dart`
+   - `add_contact.dart`
+   - `edit_contact.dart`
+   - `about.dart`
+
+2. Implemented a bottom navigation bar in `main.dart` with four sections:
+   - Contacts List (using a contacts icon)
+   - Add Contact (using an add icon)
+   - About (using an info icon)
+   - Helpful resource – [link here]
+   
+3. Ensured proper navigation between screens using named routes or `MaterialPageRoute`.
+   - Helpful resources for named routes: [link here]
+   - Helpful resources for `MaterialPageRoute` routes: [link here]
+
+4. Added appropriate titles in the AppBar for each screen.
+
+## Testing
+
+The application has been tested on a Samsung A12 device. The core features, such as creating, editing, and deleting contacts, have been successfully implemented. Here's a summary of the testing:
+
+- **Creating a Contact:** The feature works successfully, and contacts are added as expected. However, the saving process seems a bit slow, but this is still under development.
+  
+- **Saving Contacts:** Despite the slight delay in saving, contacts are stored correctly.
+
+- **Editing Contacts:** The edit functionality works as intended. Users can modify details of existing contacts without issues.
+
+- **Deleting Contacts:** The delete operation works flawlessly, allowing contacts to be removed as expected.
+
+Overall, the app's basic functionalities are working well, but there are areas (such as saving speed) that will be optimized in future developments.
