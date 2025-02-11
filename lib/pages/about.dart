@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 /*
 This is a simple About page that has some information about the Contact Management App.
 It is a stateless widget that displays the app name, description, version, developer name, and year, thats pretty much it.

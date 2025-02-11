@@ -4,7 +4,11 @@ import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ContactsDatabase extends ChangeNotifier {
-  static late Isar isar;
+  late Isar isar; // Removed 'static' keyword
+
+  // List of all the contacts in the database
+
+  List<Contact> currentContacts = [];
 
   // Initializing the Isar database
   /*
@@ -14,47 +18,56 @@ class ContactsDatabase extends ChangeNotifier {
   */
 
   Future<void> initialize() async {
-    final dir = await getApplicationDocumentsDirectory();
-    isar = await Isar.open(
-      [ContactSchema],
-      directory: dir.path,
-    );
-    await fetchContacts(); // Fetch contacts after initialization
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      isar = await Isar.open(
+        [ContactSchema],
+        directory: dir.path,
+      );
+      await fetchContacts(); // Fetchiing the contacts after initialization
+    } catch (e) {
+      debugPrint('Error initializing Isar: $e');
+    }
   }
 
-  // List of all the contacts in the database
-  List<Contact> currentContacts = [];
-
-  // This is for adding a new contact to the database
-  //It is following the constructor of the contact class from the contact.dart file
+  // Add a new contact to the database
   Future<void> addContact(String fname, String lname, String phone) async {
     try {
+      if (!isar.isOpen) {
+        await initialize(); // initiliazing again because i faced problems with 'Late Initialization when i want to test the app'
+      }
       final contact = Contact.create(fname, lname, phone);
       await isar.writeTxn(() async {
         await isar.contacts.put(contact);
       });
-      await fetchContacts(); // Refresh the contact list
+      await fetchContacts(); // Refreshing and updating the contact list after adding a new contact
     } catch (e) {
       debugPrint('Error adding contact: $e');
     }
   }
 
-  // This is for fetching all the contacts from the database
+  // Fetching all contacts from the database
   Future<void> fetchContacts() async {
     try {
+      if (!isar.isOpen) {
+        await initialize(); // Ensure isar is initialized, because of the earlier problem i encountered
+      }
       List<Contact> contacts = await isar.contacts.where().findAll();
       currentContacts.clear();
       currentContacts.addAll(contacts);
-      notifyListeners(); // Notifying the frontend to update as soon as there is a change 
+      notifyListeners(); // Notify listeners to update the frontend
     } catch (e) {
       debugPrint('Error fetching contacts: $e');
     }
   }
 
-  // Updating a contact in the database
+  // Update a contact in the database
   Future<void> updateContact(
       int id, String firstName, String lastName, String contactNumber) async {
     try {
+      if (!isar.isOpen) {
+        await initialize(); // Ensure isar is initialized
+      }
       final existingContact = await isar.contacts.get(id);
       if (existingContact != null) {
         existingContact.firstName = firstName;
@@ -64,20 +77,23 @@ class ContactsDatabase extends ChangeNotifier {
         await isar.writeTxn(() async {
           await isar.contacts.put(existingContact);
         });
-        await fetchContacts(); // Using the fetchContact() method to refresh and update the contact list in the frontend
+        await fetchContacts(); // Refreshing the contact list
       }
     } catch (e) {
       debugPrint('Error updating contact: $e');
     }
   }
 
-  // Deleting a contact from the database
+  // Delete a contact from the database
   Future<void> deleteContact(int id) async {
     try {
+      if (!isar.isOpen) {
+        await initialize(); // Ensure isar is initialized
+      }
       await isar.writeTxn(() async {
         await isar.contacts.delete(id);
       });
-      await fetchContacts(); // Using the fetchContact() method to refresh and update the contact list in the frontend
+      await fetchContacts(); // Refresh the contact list
     } catch (e) {
       debugPrint('Error deleting contact: $e');
     }

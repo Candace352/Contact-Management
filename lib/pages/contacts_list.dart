@@ -1,6 +1,6 @@
 import 'package:contact_management_app/models/contacts_database.dart';
 import 'package:contact_management_app/pages/edit_contact.dart';
-//import 'package:contact_management_app/pages/add_contact.dart'; i dont think i am using this anymore
+import 'package:contact_management_app/pages/add_contact.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -112,7 +112,6 @@ class _ContactsListState extends State<ContactsList> {
                 );
               },
             ),
-
     );
   }
 }
