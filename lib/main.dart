@@ -1,28 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:contact_management_app/models/contacts_database.dart'; // Import ContactsDatabase
-import 'package:contact_management_app/pages/contacts_list.dart'; // Import ContactsList
-import 'package:contact_management_app/pages/add_contact.dart'; // Import AddContact
-import 'package:contact_management_app/pages/about.dart'; // Import About
+import 'package:contact_management_app/pages/contacts_list.dart';
+import 'package:contact_management_app/pages/add_contact.dart';
+import 'package:contact_management_app/pages/about.dart';
 
-void main() async {
-  // Ensure Flutter is initialized
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize the ContactsDatabase
-  final contactsDatabase = ContactsDatabase();
-  await contactsDatabase.initialize(); // Initialize the database
-
-  // Run the app with MultiProvider because i faced problems with the provider as it was facing challenges contacts database
-  runApp(
-    MultiProvider(
-      providers: [
-        // Provide the ContactsDatabase instance to the app
-        ChangeNotifierProvider(create: (_) => contactsDatabase),
-      ],
-      child: const MyApp(),
-    ),
-  );
+void main() {
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -31,12 +13,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, 
+      debugShowCheckedModeBanner: false,
       title: 'Contact Management App',
-      theme: ThemeData(
-        primarySwatch: Colors.brown, 
-      ),
-      home: const MainScreen(), 
+      theme: ThemeData(primarySwatch: Colors.brown),
+      home: const MainScreen(),
     );
   }
 }
@@ -49,16 +29,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0; // Index of the selected bottom navigation bar item
-
-  // List of pages to display based on the selected index
+  int _selectedIndex = 0;
   final List<Widget> _pages = [
-    const ContactsList(), 
-    const AddContact(), 
-    const About(), 
+    const ContactsList(),
+    const AddContact(),
+    const About()
   ];
 
-  // Function to handle bottom navigation bar item selection
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -68,26 +45,23 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex], 
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.contacts), 
+        items: [
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.contacts),
             label: 'Contacts',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add), 
-            label: 'Add Contact',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info), 
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add Contact'),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.info),
             label: 'About',
           ),
         ],
-        selectedItemColor: Colors.brown[400], // Selected item color
-        unselectedItemColor: Colors.grey, // Unselected item color
+        selectedItemColor: Colors.brown[400],
+        unselectedItemColor: Colors.grey,
       ),
     );
   }

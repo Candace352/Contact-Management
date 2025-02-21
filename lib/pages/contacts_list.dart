@@ -1,8 +1,8 @@
-import 'package:contact_management_app/models/contacts_database.dart';
+import 'package:flutter/material.dart';
+import 'package:contact_management_app/models/contact.dart';
 import 'package:contact_management_app/pages/edit_contact.dart';
 import 'package:contact_management_app/pages/add_contact.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:contact_management_app/services/api.dart';
 
 class ContactsList extends StatefulWidget {
   const ContactsList({super.key});
@@ -12,106 +12,198 @@ class ContactsList extends StatefulWidget {
 }
 
 class _ContactsListState extends State<ContactsList> {
+  late Future<List<Contact>> _contactsFuture;
+
   @override
   void initState() {
     super.initState();
-    // Fetching the contacts when the widget is initialized
-    Provider.of<ContactsDatabase>(context, listen: false).fetchContacts();
+    _fetchContacts();
+  }
+
+  void _fetchContacts() {
+    setState(() {
+      _contactsFuture = ApiService.getAllContacts();
+    });
+  }
+
+  Future<void> _refreshContacts() async {
+    _fetchContacts();
+  }
+
+  Future<void> _deleteContact(int pid) async {
+    try {
+      bool success = await ApiService.deleteContact(pid);
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to delete contact')),
+        );
+        _fetchContacts();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Successfully deleted contact')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+  Future<void> _navigateToAddContact() async {
+    bool? result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (context) => const AddContact()),
+    );
+
+    if (result == true) {
+      _fetchContacts();
+    }
+  }
+
+  Future<void> _navigateToEditContact(Contact contact) async {
+    bool? result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (context) => EditContact(contact: contact)),
+    );
+
+    if (result == true) {
+      _fetchContacts();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final db = Provider.of<ContactsDatabase>(context);
-    final contacts = db.currentContacts;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'My Contacts',
-          style: TextStyle(color: Colors.white),
-        ),
-        titleSpacing: 00.0,
+        title: const Text('My Contacts',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         centerTitle: true,
-        toolbarHeight: 60.2,
-        toolbarOpacity: 0.5,
-        backgroundColor: Colors.brown[400],
+        elevation: 4,
+        backgroundColor: Colors.brown.shade400,
       ),
-      body: contacts.isEmpty
-          ? const Center(child: Text('No contacts available'))
-          : ListView.builder(
+      body: RefreshIndicator(
+        onRefresh: _refreshContacts,
+        child: FutureBuilder<List<Contact>>(
+          future: _contactsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  'Error: ${snapshot.error}',
+                  style: const TextStyle(
+                      color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No contacts available',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+              );
+            }
+
+            final contacts = snapshot.data!;
+
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 10),
               itemCount: contacts.length,
               itemBuilder: (context, index) {
                 final contact = contacts[index];
-                return ListTile(
-                  title: Text('${contact.firstName} ${contact.lastName}'),
-                  subtitle: Text(contact.contactNumber),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.brown),
-                        onPressed: () async {
-                          // Navigate to the EditContact screen
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditContact(
-                                contact:
-                                    contact, // Pass the contact to be edited
-                              ),
-                            ),
-                          );
 
-                          // Refreshing the contact list after returning from the edit screen
-                          final db = Provider.of<ContactsDatabase>(context,
-                              listen: false);
-                          await db.fetchContacts();
-                        },
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                    shadowColor: Colors.black26,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      leading: CircleAvatar(
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withOpacity(0.2),
+                        child: const Icon(Icons.person, color: Colors.black54),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          bool confirmDelete = await showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Delete Contact'),
-                              content: const Text(
-                                  'Are you sure you want to delete this contact?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, false),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Delete'),
-                                ),
-                              ],
-                            ),
-                          );
+                      title: Text(
+                        contact.pname,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        contact.pphone,
+                        style: const TextStyle(
+                            fontSize: 15, color: Colors.black54),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () => _navigateToEditContact(contact),
+                            tooltip: 'Edit Contact',
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              bool confirmDelete = await showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Delete Contact'),
+                                      content: const Text(
+                                          'Are you sure you want to delete this contact?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, false),
+                                          child: const Text('Cancel',
+                                              style: TextStyle(
+                                                  color: Colors.black54)),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, true),
+                                          child: const Text('Delete',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ),
+                                      ],
+                                    ),
+                                  ) ??
+                                  false;
 
-                          if (confirmDelete == true) {
-                            await db.deleteContact(contact.id);
-                          }
-                        },
+                              if (confirmDelete == true &&
+                                  contact.pid != null) {
+                                await _deleteContact(contact.pid!);
+                                _refreshContacts();
+                              }
+                            },
+                            tooltip: 'Delete Contact',
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditContact(
-                          contact: contact,
-                        ),
-                      ),
-                    );
-                    await db.fetchContacts(); // Refreshing the contact list
-                  },
                 );
               },
-            ),
+            );
+          },
+        ),
+      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _navigateToAddContact,
+      //   backgroundColor: Theme.of(context).primaryColor,
+      //   child: const Icon(Icons.add, color: Colors.white),
+      //   tooltip: 'Add Contact',
+      // ),
     );
   }
 }

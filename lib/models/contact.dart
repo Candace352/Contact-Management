@@ -1,28 +1,28 @@
-import 'package:isar/isar.dart';
+import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-part 'contact.g.dart';
-
-@Collection()
+// This is my Contact Model
 class Contact {
-  Id id = Isar.autoIncrement; // Auto-increment ID for Isar database
-  late String firstName;
-  late String lastName;
-  late String contactNumber;
+  int? pid;
+  String pname;
+  String pphone;
 
-  // Named constructor for better readability
-  Contact({
-    required this.firstName,
-    required this.lastName,
-    required this.contactNumber,
-  });
+  Contact({this.pid, required this.pname, required this.pphone});
 
-
-//Constructor for when creating a new contact, every contact should have the instance variables declared above
-  factory Contact.create(String firstName, String lastName, String contactNumber) {
+  factory Contact.fromJson(Map<String, dynamic> json) {
     return Contact(
-      firstName: firstName,
-      lastName: lastName,
-      contactNumber: contactNumber,
+      pid: json['pid'],
+      pname: json['pname'],
+      pphone: json['pphone'],
     );
+  }
+
+  Map<String, dynamic> toFormData() {
+    return {
+      'pname': pname,
+      'pphone': pphone,
+      if (pid != null) 'pid': pid,
+    };
   }
 }
