@@ -1,49 +1,72 @@
-# Contact Management Application
+# Contact Management App
 
-This is a semester-long project done in Flutter, where several tasks will be completed weekly. The goal is to design a fully functioning Flutter application by the end of the semester.
+This is a semester-long project developed in Flutter as part of the CS 443 – Mobile Application Development course. The project will involve weekly tasks, leading to a fully functioning Flutter application by the end of the semester.
 
-## Task 1
+## Task 1: Project Setup
 
-**Lab Tasks:**
-
-### Task 1: Project Setup
-
-1. Created a new Flutter project named 'contact_management_app'
-2. Established a basic folder structure in the lib folder:
+### Lab Tasks:
+1. Created a new Flutter project named `contact_management_app`.
+2. Established a basic folder structure in the `lib` folder:
    - `screens/` or `pages/`
    - `services/`
    - `models/` (optional)
 
-### Task 2: Bottom Navigation Implementation
+## Task 2: Bottom Navigation Implementation
 
-1. Created four screens in the `screens/` folder:
-   - `contacts_list.dart`
-   - `add_contact.dart`
-   - `edit_contact.dart`
-   - `about.dart`
+### Implementation Details:
+- Created four screens in the `screens/` folder:
+  1. `contacts_list.dart`
+  2. `add_contact.dart`
+  3. `edit_contact.dart`
+  4. `about.dart`
+- Implemented a bottom navigation bar in `main.dart` with four sections:
+  - **Contacts List** (using a contacts icon)
+  - **Add Contact** (using an add icon)
+  - **Edit Contact** (optional, for modifying existing contacts)
+  - **About** (using an info icon)
+- Ensured proper navigation between screens using either named routes or `MaterialPageRoute`.
 
-2. Implemented a bottom navigation bar in `main.dart` with four sections:
-   - Contacts List (using a contacts icon)
-   - Add Contact (using an add icon)
-   - About (using an info icon)
-   - Helpful resource – [link here]
-   
-3. Ensured proper navigation between screens using named routes or `MaterialPageRoute`.
-   - Helpful resources for named routes: [link here]
-   - Helpful resources for `MaterialPageRoute` routes: [link here]
+## Task 3: API Integration
 
-4. Added appropriate titles in the AppBar for each screen.
+Implemented API service methods to handle various contact management actions.
+
+### API Endpoints:
+1. **Get Single Contact**
+   - **Endpoint:** `https://apps.ashesi.edu.gh/contactmgt/actions/get_a_contact_mob?contid=6`
+   - **Method:** GET
+   - **Response:** JSON list of contacts (pid, pname, pphone)
+
+2. **Get All Contacts**
+   - **Endpoint:** `https://apps.ashesi.edu.gh/contactmgt/actions/get_all_contact_mob`
+   - **Method:** GET
+   - **Response:** JSON list of contacts (pid, pname, pphone)
+
+3. **Add New Contact**
+   - **Endpoint:** `https://apps.ashesi.edu.gh/contactmgt/actions/add_contact_mob`
+   - **Method:** POST
+   - **Required Data:** `{ufullname:data, uphonename:data}`
+   - **Response:** success/failed (string)
+
+4. **Edit Contact**
+   - **Endpoint:** `https://apps.ashesi.edu.gh/contactmgt/actions/update_contact`
+   - **Method:** POST
+   - **Required Data:** `{cname: formdata, cnum: formdata, cid: formdata}`
+   - **Response:** success/failed (string)
+
+5. **Delete Contact**
+   - **Endpoint:** `https://apps.ashesi.edu.gh/contactmgt/actions/delete_contact`
+   - **Method:** POST
+   - **Required Data:** `{cid:data}`
+   - **Response:** true/false (Boolean) or StatusCode of 200 (OK)
 
 ## Testing
+The application has been tested on a Samsung A12 device. The core features, such as creating, editing, and deleting contacts, have been successfully implemented.
 
-The application has been tested on a Samsung A12 device. The core features, such as creating, editing, and deleting contacts, have been successfully implemented. Here's a summary of the testing:
+### Summary of Testing:
+- **Creating a Contact:** Contacts are added as expected, though saving speed requires optimization.
+- **Saving Contacts:** Contacts are stored correctly despite a slight delay.
+- **Editing Contacts:** Users can modify details without issues.
+- **Deleting Contacts:** Contacts can be removed successfully.
 
-- **Creating a Contact:** The feature works successfully, and contacts are added as expected. However, the saving process seems a bit slow, but this is still under development.
-  
-- **Saving Contacts:** Despite the slight delay in saving, contacts are stored correctly.
-
-- **Editing Contacts:** The edit functionality works as intended. Users can modify details of existing contacts without issues.
-
-- **Deleting Contacts:** The delete operation works flawlessly, allowing contacts to be removed as expected.
-
-Overall, the app's basic functionalities are working well, but there are areas (such as saving speed) that will be optimized in future developments.
+Overall, the app’s basic functionalities work well, with future improvements focusing on performance optimization.
+P.S: This was my first Flutter application in 2 semesters, keep an open mind😬
